@@ -83,11 +83,11 @@ Apply conditions to the price list datasets(CSV files) to extract the sub-datase
 Result file(`emr_s3_pricing_table-yyyy-MM-dd.xlsx`) is created by merging from sub-datasets. Result file is being stored in the default location which is in a `price-data` folder under `hadoop-migration-assessment/optimized-tco-calculator/data/` or you specified by `--output-path`.
   - Example of EMR(EC2) price   
   
-    ![image](/imgs/price_emr.png)
+    ![image](/optimized-tco-calculator/get-aws-product-price/imgs/price_emr.png)
 
 
   - Example of S3 price    
-    ![image](/imgs/price_s3.png)
+    ![image](/optimized-tco-calculator/get-aws-product-price/imgs/price_s3.png)
 
 
 

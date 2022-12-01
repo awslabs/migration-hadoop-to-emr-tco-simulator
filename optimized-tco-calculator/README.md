@@ -66,14 +66,14 @@ Required:
     ```
 
 - Result   
-    ![image](/imgs/hourly_aggregated_result.png)
+    ![image](/optimized-tco-calculator/imgs/hourly_aggregated_result.png)
 
 
 #### 3. Open excel template file 
 > **NOTICE**   
 > REQUIREMENTS: Hourly aggregated Logs file that created from tco-input-generator.py
 1. Open [excel template file](https://github.com/awslabs/migration-hadoop-to-emr-tco-simulator/blob/main/optimized-tco-calculator/excel-tco-calculators(excel)/optimzed-emr-tco-calculator-template-v1.1.xlsm) with macro enabled.  
-    ![image](/imgs/enable_excel_macro.png)
+    ![image](/optimized-tco-calculator/imgs/enable_excel_macro.png)
 
 2. Enter your values to green cells    
    - Customer Hadoop Cluster Information (Ask customer about on-premise cluster infomration : HDFS size, Data Nose Spec(mem, vcore))
@@ -81,20 +81,20 @@ Required:
      Enter customer hadoop information HDFS size(TB) and cluster Hardware spec. (This is example way  how customer can get their cluster infomration)
      - HDFS size(TB): Enter original data size(Do NOT include storage overhead size(copy data or erasure coding data)    
        - Use `hdfs dfs -df -h` command    
-         ![image](/imgs/hdfs_dfs_cmd.png)    
+         ![image](/optimized-tco-calculator/imgs/hdfs_dfs_cmd.png)    
          (This sample cluster has 200% storage overhead. Thus it should be divided by 3)
        
        - Access HDFS Name Node UI    
-         ![image](/imgs/hdfs_namenode_ui.png)    
+         ![image](/optimized-tco-calculator/imgs/hdfs_namenode_ui.png)    
          (This sample cluster has 200% storage overhead. Thus it should be divided by 3)
          
      - Hardware specification: Get namenodes and datanodes hardware information and enter the average of all namenodes and datanodes.
        > If your Name node and Data node have different specification, enter average value.   
        > Example: 3 Name nodes with 32 cores and 256GB memory, 10 Data nodes with 16 cores and 128GB memory.
-       > ![image](/imgs/namenode_spec.png)    
+       > ![image](/optimized-tco-calculator/imgs/namenode_spec.png)    
    - Load Input Data   
      - Click and select hourly aggregated logs as you [created above](#2.-Aggregate-yarn-logs-into-hourly-by-running-tco-input-generator.py)
-       ![image](/imgs/load_input_data.png)   
+       ![image](/optimized-tco-calculator/imgs/load_input_data.png)   
      - (Optional)Get up-to-date EMR and S3 price list([Detail instruction](https://github.com/awslabs/migration-hadoop-to-emr-tco-simulator/tree/main/optimized-tco-calculator/get-aws-product-price))   
        **Default price table already loaded** in optimzed-emr-tco-calculator-test.xlsm    
        If you want to renew price data follow this and load new price table file.    
@@ -109,9 +109,9 @@ Required:
       - Local currency rate : Set the exchange rate of a currency according to your region( Set 1 --> USD)
      > NOTICE: 
      > Below the **Check cell value must have 100%**.    
-     > ![image](/imgs/tco_vars.png)
+     > ![image](/optimized-tco-calculator/imgs/tco_vars.png)
 
 3. TCO simulation results
    Optimzed TCO (EC2, Storage) will be automatically calculated including lift-and-shift mirgation cost(EC2)
    Daily required Nodes/hour graph also automatically displayed.
-   ![image](/imgs/tco_sim_result.png)
+   ![image](/optimized-tco-calculator/imgs/tco_sim_result.png)
