@@ -13,7 +13,7 @@ This template file provides an assessment solution for analyzing YARN logs throu
 
 ## **Prerequisites**
 
-1.  Upload your yarn logs file(cluster_yarn_log.csv) result from [yarn-log-collector](https://gitlab.aws.dev/proserve-kr-dna/hadoop-migration-assessment/-/tree/main/yarn-log-collector) to a specific path(e.g., `s3://DOC-EXAMPLE-BUCKET/yarn-log/2022-01/`) on S3 bucket.
+1.  Upload your yarn logs file(cluster_yarn_log.csv) result from [yarn-log-collector](https://github.com/awslabs/migration-hadoop-to-emr-tco-simulator/tree/main/yarn-log-collector) to a specific path(e.g., `s3://DOC-EXAMPLE-BUCKET/yarn-log/2022-01/`) on S3 bucket.
 
 2.  Create a manifest(e.g., `yarn-log-manifest.json`) file about log files, and upload the manifest file to S3(e.g., `s3://DOC-EXAMPLE-BUCKET/yarn-log/manifest`).
 

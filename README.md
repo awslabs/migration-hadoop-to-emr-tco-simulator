@@ -1,8 +1,6 @@
 # Hadoop Migration Assessment (TCO-Simulator)
 This repository constains a set of hadoop migrate to Amazon EMR TCO estimator.
 
-This tool will be part of the [**EMR Delivery Excellence program**](https://wiki.doleancloud.com/confluence/display/HMDK/Hadoop+to+EMR+Migration+Delivery+Kit) with the kit as the core asset
-
 ## Table of Contents  
    1. [Project Background](#Project-Background)
    2. [Tool capability](#Tool-capability)
@@ -45,7 +43,7 @@ The repo is subdivided into sections for each step to get Amazon EMR TCO(Total C
 ## <a name="yarn-log-collector"></a>1. yarn-log-collector
  - Extract the application history information using resource manager application API
  - Customer can easily extract logs using provided python application or containered python apps in customer computer which can connect hadoop master node 
- - [Run instruction](https://gitlab.aws.dev/hadoop-migration/hadoop-migration-factory/hadoop-migration-assessment-tco/-/tree/main/yarn-log-collector)
+ - [Run instruction](https://github.com/awslabs/migration-hadoop-to-emr-tco-simulator/tree/main/yarn-log-collector)
 
 ## <a name="yarn-log-analysis"></a>2. yarn-log-analysis
 ![image](/imgs/quicksight_dashboard.png)  
@@ -53,15 +51,14 @@ The repo is subdivided into sections for each step to get Amazon EMR TCO(Total C
  - Analize customer's hadoop application logs to design the emr custers with AWS QuickSight  
  - [Dashboard Generation] Create QuickSight dashboard automatcially in target aws account with Cloud Formation Template
  - [Deign Clusters] Design EMR clusters according analyis result and and make a clustered design info file using provided excel template manually
- - [Run instruction](https://gitlab.aws.dev/hadoop-migration/hadoop-migration-factory/hadoop-migration-assessment-tco/-/tree/main/yarn-log-analysis/quicksight/cfn-target)
- - [How to anayze the quicksight Dashboard : example guide](https://gitlab.aws.dev/hadoop-migration/hadoop-migration-factory/hadoop-migration-assessment-tco//-/wikis/How-to-analyze-yarn-applications-logs-from-Quicksight-dashbords-(ENG))
+ - [Run instruction](https://github.com/awslabs/migration-hadoop-to-emr-tco-simulator/tree/main/yarn-log-analysis/quicksight/cfn-target)
 
 ## <a name="optimized-tco-calculator"></a>3. optimized-tco-calculator
  - Calculate the optimized TCO for EMR.  
  - [Preperation] Make a houlry aggregated logs file for TCO calculation according to emr cluster design info using provided python app.   
  - [TCO calculation] Calculate and simulate optimzed TCO using provided Excel template    
 ![image](/imgs/tco_simulation.png)  
- - [Run instruction](https://gitlab.aws.dev/hadoop-migration/hadoop-migration-factory/hadoop-migration-assessment-tco/-/tree/main/optimized-tco-calculator)
+ - [Run instruction](https://github.com/awslabs/migration-hadoop-to-emr-tco-simulator/tree/main/optimized-tco-calculator)
 
 ## Getting Help
 Requests issues for questions, bugs, and feature requests.

@@ -34,7 +34,7 @@ Required:
 For example, the following command retrieves the organized resource manager logs.
 - Run example
 ```
-python3 yarn-log-organizer.py  -ld /Users/hanguk/Desktop/demo/
+python3 yarn-log-organizer.py  -ld /Users/admin/Desktop/demo/
 
 
 Start yarn logs collecting from API
@@ -43,13 +43,13 @@ Start yarn logs collecting from API
 ****************************************
 Collecting condition
 ****************************************
-directory of yarn-logs-json files from curl command: /Users/hanguk/Desktop/demo/
+directory of yarn-logs-json files from curl command: /Users/admin/Desktop/demo/
 ****************************************
 Collecting Result
 ****************************************
 log count from yarn resource manager: 21160
 count files stored in csv: 10735
-Output file created at /Users/hanguk/hadoop-migration-assessment-tco/optimized-tco-calculator/data/yarn-app-logs/cluster_yarn_log_2022-04-16-05-06-46_2022-05-17-12-10-44.csv
+Output file created at /Users/admin/hadoop-migration-assessment-tco/optimized-tco-calculator/data/yarn-app-logs/cluster_yarn_log_2022-04-16-05-06-46_2022-05-17-12-10-44.csv
 Collecting yarn logs completed
 ```
 
