@@ -5,7 +5,7 @@ setup(
     version="1.0",
     author="HeejoungSim",
     install_requires=[
-        'numpy==1.21.5',
+        'numpy==1.22.0',
         'boto3==1.18.51',
         'pandas==1.3.5',
         'XlsxWriter==3.0.2',
