@@ -1,0 +1,263 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Description: Setup QuickSight for YARN logs analysis - This stack provides an assessment solution for analyzing YARN logs through AWS QuickSight dashboards.
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      -
+        Label:
+          default: QuickSight User Configuration
+        Parameters:
+          - AdminUser
+      -
+        Label:
+          default: QuickSight DataSet Configuration
+        Parameters:
+          - ManifestS3BucketName
+          - ManifestS3FileLocation
+          - DataSetName
+      -
+        Label:
+          default: QuickSight Dashboard Configuration
+        Parameters:
+          - DashboardName
+    ParameterLabels:
+      AdminUser:
+        default: Admin username
+      DataSetName:
+        default: Dataset name
+      ManifestS3BucketName:
+        default: Manifest S3 bucket name
+      ManifestS3FileLocation:
+        default: Manifest S3 file location
+      DashboardName:
+        default: Dashboard name
+
+Parameters:
+  AdminUser:
+    Type: String
+    Description: After creating an administrator on QuickSight, update the admin username.
+      Reference - https://docs.aws.amazon.com/quicksight/latest/user/managing-users.html#view-user-accounts
+  DataSetName:
+    Type: String
+    Description: The logical name of the dataset. e.g., Coupang - YARN Log - 12/2021
+  ManifestS3BucketName:
+    Type: String
+    AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-.]*[0-9a-zA-Z])*$
+    ConstraintDescription: Bucket name can include numbers, lowercase letters, uppercase letters, periods (.), and hyphens (-). It cannot start or end with a hyphen (-).
+    Description: S3 bucket name where the manifest file is located. e.g., emr-tco-data-bucket
+  ManifestS3FileLocation:
+    Type: String
+    Description: The location of the manifest file. e.g., yarn-log/yarn-log-manifest.json
+  DashboardName:
+    Type: String
+    Description: The display name of the dashboard. e.g., YARN Analysis Dashboard
+
+Resources:
+  CustomFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Join ['-', ['GrantPermission', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]]]]
+      Code:
+        ZipFile: |
+          import cfnresponse
+          import json
+          import urllib3
+
+          def handler(event, context):
+            http = urllib3.PoolManager()
+            aws_account_id = context.invoked_function_arn.split(":")[4]
+            # api-endpoint
+            URL = "https://amnm9d61yd.execute-api.ap-northeast-2.amazonaws.com/accountid/"+aws_account_id
+
+            # sending get request and saving the response as response object
+            result = http.request('GET', URL)
+
+            # cfnresponse.send(event, context, cfnresponse.SUCCESS, {}, "OK")
+            response = {'Message': 'OK'}
+            cfnresponse.send(event, context, cfnresponse.SUCCESS, response, "responseMessage")
+      Handler: index.handler
+      Role: !GetAtt CustomFunctionRole.Arn
+      Runtime: python3.9
+      Timeout: 60
+
+  CustomFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  GrantDashboardAccessPermission:
+    Type: AWS::CloudFormation::CustomResource
+    Properties:
+      ServiceToken: !GetAtt CustomFunction.Arn
+
+  YARNLogDataSource:
+    Type: AWS::QuickSight::DataSource
+    Properties:
+      AwsAccountId: !Ref AWS::AccountId
+      DataSourceId: !Join ['-', ['datasource-yarn', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]]]]
+      DataSourceParameters:
+        S3Parameters:
+          ManifestFileLocation:
+            Bucket: !Ref ManifestS3BucketName
+            Key: !Ref ManifestS3FileLocation
+      Name: DataSource from S3
+      Permissions:
+        - Actions:
+            - quicksight:DescribeDataSource
+            - quicksight:DescribeDataSourcePermissions
+            - quicksight:PassDataSource
+            - quicksight:UpdateDataSource
+            - quicksight:DeleteDataSource
+            - quicksight:UpdateDataSourcePermissions
+          Principal: !Sub 'arn:aws:quicksight:${AWS::Region}:${AWS::AccountId}:user/default/${AdminUser}'
+      Tags:
+        - Key: Name
+          Value: DataSource from S3
+        - Key: application
+          Value: QuickSight
+      Type: S3
+
+  YARNLogDataSet:
+    Type: AWS::QuickSight::DataSet
+    Properties:
+      AwsAccountId: !Ref AWS::AccountId
+      DataSetId: !Join ['-', ['dataset-yarn', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]]]]
+      Name: !Ref DataSetName
+      ImportMode: SPICE
+      PhysicalTableMap:
+        yarn-log:
+          S3Source:
+            DataSourceArn: !GetAtt YARNLogDataSource.Arn
+            InputColumns:
+              - Name: id
+                Type: STRING
+              - Name: user
+                Type: STRING
+              - Name: name
+                Type: STRING
+              - Name: queue
+                Type: STRING
+              - Name: applicationType
+                Type: STRING
+              - Name: startedTime
+                Type: STRING
+              - Name: finishedTime
+                Type: STRING
+              - Name: elapsedTime
+                Type: STRING
+              - Name: memorySeconds
+                Type: STRING
+              - Name: vcoreSeconds
+                Type: STRING
+      LogicalTableMap:
+        yarn-log:
+          Alias: yarn-log
+          Source:
+            PhysicalTableId: yarn-log
+          DataTransforms:
+            - CastColumnTypeOperation:
+                ColumnName: startedTime
+                Format: yyyy-MM-dd HH:mm:ss
+                NewColumnType: DATETIME
+            - CastColumnTypeOperation:
+                ColumnName: finishedTime
+                Format: yyyy-MM-dd HH:mm:ss
+                NewColumnType: DATETIME
+            - CastColumnTypeOperation:
+                ColumnName: elapsedTime
+                NewColumnType: DECIMAL
+            - CastColumnTypeOperation:
+                ColumnName: memorySeconds
+                NewColumnType: INTEGER
+            - CastColumnTypeOperation:
+                ColumnName: vcoreSeconds
+                NewColumnType: INTEGER
+            - CreateColumnsOperation:
+                Columns:
+                  - ColumnId: elapsedGroup
+                    ColumnName: elapsedGroup
+                    Expression: ifelse({elapsedTime} < 10, 'Group 1', {elapsedTime} >= 10 AND {elapsedTime} < 30, 'Group 2', {elapsedTime} >= 30 AND {elapsedTime} < 60, 'Group 3', 'Group 4')
+            - CreateColumnsOperation:
+                Columns:
+                  - ColumnId: jobStatus
+                    ColumnName: jobStatus
+                    Expression: ifelse(dateDiff({startedTime},{finishedTime},'MS') < 0, 'F', 'S')
+            - CreateColumnsOperation:
+                Columns:
+                  - ColumnId: hourTime
+                    ColumnName: hourTime
+                    Expression: ifelse(strlen(toString(extract('HH',{startedTime})))=1, concat('0',toString(extract('HH',{startedTime}))), toString(extract('HH',{startedTime})))
+            - CreateColumnsOperation:
+                Columns:
+                  - ColumnId: dayOfWeek
+                    ColumnName: dayOfWeek
+                    Expression: ifelse( extract('WD', {startedTime})=1, '7-Sun', ifelse(extract('WD', {startedTime})=2, '1-Mon', ifelse(extract('WD', {startedTime})=3, '2-Tue', ifelse(extract('WD', {startedTime})=4, '3-Wed', ifelse(extract('WD', {startedTime})=5, '4-Thu', ifelse(extract('WD', {startedTime})=6, '5-Fri', ifelse(extract('WD', {startedTime})=7, '6-Sat', 'Null' )))))))
+      Permissions:
+        - Actions:
+            - quicksight:DescribeDataSet
+            - quicksight:PassDataSet
+            - quicksight:UpdateDataSet
+            - quicksight:DeleteDataSet
+            - quicksight:CreateIngestion
+            - quicksight:DescribeIngestion
+            - quicksight:ListIngestions
+            - quicksight:CancelIngestion
+            - quicksight:DescribeDataSetPermissions
+            - quicksight:UpdateDataSetPermissions
+          Principal: !Sub 'arn:aws:quicksight:${AWS::Region}:${AWS::AccountId}:user/default/${AdminUser}'
+      Tags:
+        - Key: Name
+          Value: !Ref DataSetName
+        - Key: application
+          Value: QuickSight
+
+  YARNLogDashboard:
+    Type: AWS::QuickSight::Dashboard
+    Properties:
+      AwsAccountId: !Ref AWS::AccountId
+      DashboardId: !Join ['-', ['dashboard-yarn', !Select [4, !Split ['-', !Select [2, !Split ['/', !Ref AWS::StackId]]]]]]
+      Name: !Ref DashboardName
+      SourceEntity:
+        SourceTemplate:
+          DataSetReferences:
+            - DataSetArn: !GetAtt YARNLogDataSet.Arn
+              DataSetPlaceholder: YARNLogs
+          Arn: arn:aws:quicksight:ap-northeast-2:040620516479:template/yarn_analysis_template
+      DashboardPublishOptions:
+        AdHocFilteringOption:
+          AvailabilityStatus: ENABLED
+        ExportToCSVOption:
+          AvailabilityStatus: ENABLED
+        SheetControlsOption:
+          VisibilityState: EXPANDED
+      Permissions:
+        - Actions:
+            - quicksight:DescribeDashboard
+            - quicksight:ListDashboardVersions
+            - quicksight:UpdateDashboardPermissions
+            - quicksight:QueryDashboard
+            - quicksight:UpdateDashboard
+            - quicksight:DeleteDashboard
+            - quicksight:DescribeDashboardPermissions
+            - quicksight:UpdateDashboardPublishedVersion
+          Principal: !Sub 'arn:aws:quicksight:${AWS::Region}:${AWS::AccountId}:user/default/${AdminUser}'
+
+Outputs:
+  DataSetName:
+    Value: !Ref DataSetName
+  DashboardName:
+    Value: !Ref DashboardName
+  GrantDashboardAccessPermission:
+    Value: !GetAtt GrantDashboardAccessPermission.Message

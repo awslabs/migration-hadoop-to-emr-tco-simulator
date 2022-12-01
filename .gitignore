@@ -1,0 +1,22 @@
+# Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: MIT-0
+*.swp
+package-lock.json
+__pycache__
+.pytest_cache
+.env
+.venv
+.vscode
+*.egg-info
+**/.DS_Store
+**/output/~*.xlsx
+*.ipynb*
+~*.xls*
+**/data/yarn-app-logs/*.csv
+*.egg
+
+# CDK asset staging directory
+.cdk.staging
+cdk.out
+.idea/
+cdk.context.json
