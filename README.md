@@ -13,7 +13,7 @@ This tool will be part of the [**EMR Delivery Excellence program**](https://wiki
 
 ## <a name="Project-Background"></a>Project Background
 When you migrate on-premise hadoop cluster to Amazon EMR, you would start long journey to get optimized EMR. There are some ways to migrate AWS, Lift & Shift, Hybrid and Re-architect. Re-architecting your platform is inevitable to get maximized the benefits of the cloud.   
- <img src="/uploads/612b67298448c585afadf65c58182e4d/image.png" width="700"/> 
+![image](/imgs/tco_comparison.png)
 
 A re-architecture approach to migration includes the following benefits for your applications(from [AWS EMR migration guide](https://d1.awsstatic.com/whitepapers/amazon_emr_migration_guide.pdf)): 
 - Independent scaling of components due to separated storage and compute resources.
@@ -48,7 +48,7 @@ The repo is subdivided into sections for each step to get Amazon EMR TCO(Total C
  - [Run instruction](https://gitlab.aws.dev/hadoop-migration/hadoop-migration-factory/hadoop-migration-assessment-tco/-/tree/main/yarn-log-collector)
 
 ## <a name="yarn-log-analysis"></a>2. yarn-log-analysis
- <img src="/uploads/3a749ba7a24f1667836f0ed689e29ec6/image.png" width="700"/>    
+![image](/imgs/quicksight_dashboard.png)  
 
  - Analize customer's hadoop application logs to design the emr custers with AWS QuickSight  
  - [Dashboard Generation] Create QuickSight dashboard automatcially in target aws account with Cloud Formation Template
@@ -60,7 +60,7 @@ The repo is subdivided into sections for each step to get Amazon EMR TCO(Total C
  - Calculate the optimized TCO for EMR.  
  - [Preperation] Make a houlry aggregated logs file for TCO calculation according to emr cluster design info using provided python app.   
  - [TCO calculation] Calculate and simulate optimzed TCO using provided Excel template    
-   <img src="/uploads/db9ac4335bda0d0bb6e0502c0a19d6e9/image.png" width="700"/>   
+![image](/imgs/tco_simulation.png)  
  - [Run instruction](https://gitlab.aws.dev/hadoop-migration/hadoop-migration-factory/hadoop-migration-assessment-tco/-/tree/main/optimized-tco-calculator)
 
 ## Getting Help
