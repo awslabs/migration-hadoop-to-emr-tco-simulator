@@ -25,23 +25,6 @@ class bcolors:
 def mstoMinute(time): 
     return float(time/1000/60)
 
-def api_request(API_Host, path, query):
-        
-        # url = API_HOST + path + '?startedTimeBegin=1627743600&startedTimeEnd=1630421999'
-        url = API_Host + path +"?"+ query
-        
-        '''
-        for kerberos setting
-        ex) curl -k --negotiate -u: -X GET https://rmhost:8090/ws/v1/cluster/apps
-        '''
-        #auth = requests_negotiate.HTTPNegotiateAuth() # 
-        print("yarn resource manager api url: {}".format(url))
-
-        req = os.popen("curl -k --negotiate -u: -X  GET '{}'".format(url))
-
-        return req
-
-
 def main(argv):
 
     #########################
@@ -51,7 +34,7 @@ def main(argv):
     startTime = ""
     endTime = "" 
     
-    parser = argparse.ArgumentParser(description='yarn log collector')
+    parser = argparse.ArgumentParser(description='yarn log organizer')
    
     parser.add_argument('-u', '--url', dest='url', help='yarn resource manager url', required=False)
     parser.add_argument('-start', '--start', dest='start', help='Start time you want to collect ex) 2021-12-26-00:00:00,default:now()-14 days' , required= False)
@@ -67,8 +50,8 @@ def main(argv):
     logs_dir = args.log_dir
 
     if (rmUrl is None) and  (logs is None) and (logs_dir is None):
-        #print("usage (HTTP) : python yarn-log-collector.py -i yarn-resoure-manager-ip -p 8088 (optional) -start 2022-01-01-00:00:00 -end 2022-01-14-00:00:00 (default now())")
-        print("usage: python yarn-log-collector.py -url http://yarn-resource-manager-ip:8088 -start 2022-01-01-00:00:00 -end 2022-01-14-00:00:00 (default now())" )
+        #print("usage (HTTP) : python yarn-log-organizer.py -i yarn-resoure-manager-ip -p 8088 (optional) -start 2022-01-01-00:00:00 -end 2022-01-14-00:00:00 (default now())")
+        print("usage: python yarn-log-organizer.py -url http://yarn-resource-manager-ip:8088 -start 2022-01-01-00:00:00 -end 2022-01-14-00:00:00 (default now())" )
         print("Info:start, end time is optional, if you do not input start and end time, it will request latest 14 days application logs history by default")
         print("Info:Recommaned days (start ~ end time) is more than 7 days ")
         exit(1)
@@ -116,19 +99,6 @@ def main(argv):
     endQuery = 'finishedTimeEnd=' + endTime
 
     data = ''
-    if rmUrl:
-        resource_manager_url = rmUrl.rstrip('/')
-        #print("*" * 8)
-        print(resource_manager_url)
-        try:
-            resp = api_request(resource_manager_url, '/ws/v1/cluster/apps', startQuery + "&" + endQuery)
-            try: data = json.loads(resp.read())
-            except: sys.exit()
-        except: 
-            print("Request IP or URL is NOT valid")
-            sys.exit()
-
-    # Test http://52.79.184.58:8088/ws/v1/cluster/apps?startedTimeBegin=1640390400000
 
     if logs:
         try: 
@@ -272,6 +242,6 @@ if __name__ == "__main__":
     )
     # logging.info('start programs')
     print("\n")
-    print("Start yarn logs collecting from API")
+    print("Start yarn logs organizing from API")
    
     main(sys.argv)
