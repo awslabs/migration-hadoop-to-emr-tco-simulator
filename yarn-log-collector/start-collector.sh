@@ -13,7 +13,7 @@ do
     esac
 done
 
-output=collected_logs/customer-yarn-logs-json-$(date +"%Y-%m-%d-%T").json
+output=customer-yarn-logs-json-$(date +"%Y-%m-%d-%T").json
 cluster_api="/ws/v1/cluster/apps"
 target="${url}${cluster_api}"
 
