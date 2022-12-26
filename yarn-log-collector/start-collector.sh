@@ -3,7 +3,7 @@
 #HTTP Secure Mode : [1] HTTPS with Kerberos Case [2] HTTPS Case [3] HTTP Case 
 #YARN Resource Manager URL form:
 #[HTTPS] https://yarn-resoure-manager-ip-adress:8090
-#[HTTP] http://yarn-resoure-manager-ip-adress:8088
+#[HTTP] http://yarn-resoure-manager-ip-adress:8088 
 
 while getopts m:u: flag
 do
@@ -12,14 +12,15 @@ do
         u) url=${OPTARG};;
     esac
 done
+
+output=collected_logs/customer-yarn-logs-json-$(date +"%Y-%m-%d-%T").json
+cluster_api="/ws/v1/cluster/apps"
 target="${url}${cluster_api}"
 
 echo "Start yarn logs collecting from curl."
 echo "HTTP Secure-Mode: $mode"
 echo "YARN-RM URL: $url"
 echo "Yarn Cluter API target: $target"
-output=customer-yarn-logs-json-$(date +"%Y-%m-%d-%T").json
-
 
 if [ $mode -eq 1 ]
 then
