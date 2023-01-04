@@ -36,25 +36,34 @@ def main(argv):
     
     parser = argparse.ArgumentParser(description='yarn log organizer')
    
-    parser.add_argument('-u', '--url', dest='url', help='yarn resource manager url', required=False)
+    # parser.add_argument('-u', '--url', dest='url', help='yarn resource manager url', required=False)
     parser.add_argument('-start', '--start', dest='start', help='Start time you want to collect ex) 2021-12-26-00:00:00,default:now()-14 days' , required= False)
     parser.add_argument('-end', '--end', dest='end',help='end time you want to collect ex) 2021-12-30-00:00:00, default : now()', required= False)
     parser.add_argument('-l', '--log', dest='log',help='yarn logs file from curl commands, no other option needed', required= False)
     parser.add_argument('-ld', '--log_dir', dest='log_dir',help='yarn logs file directory from curl commands, no other option needed', required= False)
 
+    # rmUrl = args.url    ## Remove resource manager url args  by sangyeon
     args = parser.parse_args()
     startTime_Request = args.start
     endTime_Request = args.end
-    rmUrl = args.url
     logs = args.log
     logs_dir = args.log_dir
 
-    if (rmUrl is None) and  (logs is None) and (logs_dir is None):
+
+    # if (rmUrl is None) and  (logs is None) and (logs_dir is None):
+    #     #print("usage (HTTP) : python yarn-log-organizer.py -i yarn-resoure-manager-ip -p 8088 (optional) -start 2022-01-01-00:00:00 -end 2022-01-14-00:00:00 (default now())")
+    #     print("usage: python yarn-log-organizer.py -url http://yarn-resource-manager-ip:8088 -start 2022-01-01-00:00:00 -end 2022-01-14-00:00:00 (default now())" )
+    #     print("Info:start, end time is optional, if you do not input start and end time, it will request latest 14 days application logs history by default")
+    #     print("Info:Recommaned days (start ~ end time) is more than 7 days ")
+    #     exit(1)
+
+    if (logs is None) and (logs_dir is None):
         #print("usage (HTTP) : python yarn-log-organizer.py -i yarn-resoure-manager-ip -p 8088 (optional) -start 2022-01-01-00:00:00 -end 2022-01-14-00:00:00 (default now())")
-        print("usage: python yarn-log-organizer.py -url http://yarn-resource-manager-ip:8088 -start 2022-01-01-00:00:00 -end 2022-01-14-00:00:00 (default now())" )
+        print("usage: python yarn-log-organizer.py -l file.json (optional) -start 2022-01-01-00:00:00 -end 2022-01-14-00:00:00 (default now())" )
         print("Info:start, end time is optional, if you do not input start and end time, it will request latest 14 days application logs history by default")
         print("Info:Recommaned days (start ~ end time) is more than 7 days ")
         exit(1)
+
 
     # Timeformat Validation : modified by sungyoul
     now = datetime.datetime.now()
@@ -63,39 +72,36 @@ def main(argv):
     else :  
         startTime_Request = (now - datetime.timedelta(days=14)).strftime("%Y-%m-%d-%H:%M:%S")
         date_format.validateTimeFormat(startTime_Request)
-
     if endTime_Request:
-        date_format.validateTimeFormat(endTime_Request)
+            date_format.validateTimeFormat(endTime_Request)
     else :   
         endTime_Request = now.strftime("%Y-%m-%d-%H:%M:%S")
         date_format.validateTimeFormat(endTime_Request)
 
-    print("\n")
     print("*" * 40 )
     print("Collecting condition")
     print("*" * 40 )
-    #print("\n")
 
-    if rmUrl:
-        print("rm_url: {}".format(rmUrl))
-        print("start time: {}".format(startTime_Request))
-        print("end time: {}".format(endTime_Request))
-    elif logs:
+    # if rmUrl:
+    #     print("rm_url: {}".format(rmUrl))
+    #     print("start time: {}".format(startTime_Request))
+    #     print("end time: {}".format(endTime_Request))
+    # elif logs:
+    #     print("yarn-logs-json file from curl command: {}".format(logs))
+    # elif logs_dir:
+    #      print("directory of yarn-logs-json files from curl command: {}".format(logs_dir))
+    
+    if logs:
         print("yarn-logs-json file from curl command: {}".format(logs))
     elif logs_dir:
          print("directory of yarn-logs-json files from curl command: {}".format(logs_dir))
 
-    
-    # toTimeStamp('2021-08-01 00:00:00') # 1627743600
-    # toTimeStamp('2021-08-31 23:59:59') # 1630421999
 
     # make startQuery
     startTime = timestamp.toTimeStamp(startTime_Request)
     startQuery = 'startedTimeBegin=' + startTime
 
-    # endTime = timestamp.toTimeStamp('2021-12-30-00:00:00')
-    endTime = timestamp.toTimeStamp(endTime_Request)
-  
+    endTime = timestamp.toTimeStamp(endTime_Request)  
     endQuery = 'finishedTimeEnd=' + endTime
 
     data = ''
@@ -138,6 +144,7 @@ def main(argv):
                       'elapsedTime', 'memorySeconds', 'vcoreSeconds', 'state', 'finalStatus']
     '''
     ## Create output dataframe
+    full_list =[]    ## extracted list from yarn log json
     resp_list = []
     df_output = pd.DataFrame(resp_list, columns=extract_headers, dtype=object)
 
@@ -145,21 +152,24 @@ def main(argv):
     for list in data['apps']['app']:
         cleaned_data = []
         cleaned_extract_headers = []
+        append_data=cleaned_data.append
         for header in extract_headers:
             for key, val in list.items():
                 if key == header:
-                    cleaned_data.append(val)
+                    append_data(val)
                     cleaned_extract_headers.append(key)
                     break
-
         if len(cleaned_data) == len(extract_headers):
-            df_loop = pd.DataFrame([cleaned_data], columns=extract_headers)
-            df_output = pd.concat([df_output, df_loop])     #df_output.append(df_loop) (append deprecated)
+            full_list.append(cleaned_data)
         else:
             print(cleaned_extract_headers)
             df_loop = pd.DataFrame([cleaned_data], columns=cleaned_extract_headers)
             df_output = pd.concat([df_output, df_loop])     #df_output.append(df_loop)
 
+    ## make csv files 
+    df_full = pd.DataFrame(full_list, columns=extract_headers)
+    df_output = pd.concat([df_output, df_full])
+    
     ## etl processing
     ## Remove new line
     def removelines(value):
@@ -177,8 +187,7 @@ def main(argv):
     print("*" * 40 )
     print("Collecting Result")
     print("*" * 40 )
-    #print("\n")
-
+    
     print("log count from yarn resource manager: {}".format(len(data['apps']['app'])))
     print("count files stored in csv: {}".format(len(df_output)))
     
@@ -208,8 +217,7 @@ def main(argv):
     collected_days = (datetime.datetime.strptime(log_end,"%Y-%m-%d-%H-%M-%S") - datetime.datetime.strptime(log_start,"%Y-%m-%d-%H-%M-%S")).days
 
     csvFile = "cluster_yarn_log_{}_{}.csv".format(log_start, log_end)
-
-
+    
     df_output.to_csv("../../optimized-tco-calculator/data/yarn-app-logs/{}".format(csvFile), sep=delimeter, mode='w', index=False)
     abs_path = os.path.abspath("../../optimized-tco-calculator/data/yarn-app-logs/"+ csvFile)
 
@@ -242,6 +250,6 @@ if __name__ == "__main__":
     )
     # logging.info('start programs')
     print("\n")
-    print("Start yarn logs organizing from API")
+    print("Start yarn logs organizing from yarn log json file")
    
     main(sys.argv)
