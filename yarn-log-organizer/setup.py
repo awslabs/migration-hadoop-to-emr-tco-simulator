@@ -13,14 +13,6 @@ def requirements():
         required = f.read().splitlines()
     return required
 
-# install_requires = [
-#         "numpy==1.12.0;python_version<'3.6.0'",
-#         "pandas==0.24.2;python_version<'3.6.0'",
-#         "numpy==1.15.4;python_version>='3.6.1'",
-#         "pandas==1.1.5;python_version>='3.6.1'",
-#         "requests==2.26"
-#         ]
-
 setup(name='yarn log collector',
       version='1.0',
       description='made by AWS Proserve korea AID Practice',
