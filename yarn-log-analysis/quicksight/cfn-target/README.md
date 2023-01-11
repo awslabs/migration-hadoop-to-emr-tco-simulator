@@ -34,7 +34,8 @@ This template file provides an assessment solution for analyzing YARN logs throu
     ```
 
 3.  Create an administrator user on QuickSight management console.
-4.  To have QuickSight account with access to S3 bucket in which logs data located
+4.  Upgrade to Enterprise edition if your subscription is Standard edition. https://docs.aws.amazon.com/quicksight/latest/user/upgrading-subscription.html
+5.  To have QuickSight account with access to S3 bucket in which logs data located
 
    <img src="/yarn-log-analysis/quicksight/cfn-target/docs/asset/QuickSight-S3-permission.png" width="800"/>
 
