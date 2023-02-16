@@ -14,6 +14,8 @@
 #### Parameters
 - -m: mode [1] HTTPS with Kerberos Case [2] HTTPS Case [3] HTTP Case ex) -m 3
 - -u: yarn resource manager url (http or https) ex) https://xx.xx.xx.xx:8090, http://xx..xx.xx:8088
+  - null: `aws emr list-clusters --active`
+    - Need to install [`jq`](https://stedolan.github.io/jq/download/)
 
 - Run example 
 ```
@@ -21,11 +23,11 @@ sh start-collector.sh -m 3 -u 10.10.160.64
 ### Start yarn logs collecting from curl.
 ### HTTP Secure-Mode: 3
 ### YARN-RM HOST: 10.10.160.64
-### Yarn Cluter API target: http://10.10.160.64:8088/ws/v1/cluster/apps
 ### HTTP Case
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
 100 18.0M    0 18.0M    0     0  22.0M      0 --:--:-- --:--:-- --:--:-- 22.0M
+### Yarn Cluter API target: http://10.10.160.64:8088/ws/v1/cluster/apps
 ### Collecting yarn logs completed.
 ```
 ```
@@ -35,11 +37,11 @@ sh start-collector.sh -m 3
 ### Start yarn logs collecting from curl.
 ### HTTP Secure-Mode: 3
 ### YARN-RM HOST: 10.10.160.64
-### Yarn Cluter API target: http://10.10.160.64:8088/ws/v1/cluster/apps
 ### HTTP Case
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
 100 18.0M    0 18.0M    0     0  22.0M      0 --:--:-- --:--:-- --:--:-- 22.0M
+### Yarn Cluter API target: http://10.10.160.64:8088/ws/v1/cluster/apps
 ### Collecting yarn logs completed.
 ```
 Result file(collected yarn logs) generated in output running directory.
