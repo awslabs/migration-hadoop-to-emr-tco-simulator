@@ -28,6 +28,8 @@ if [[ -z "${url}" ]]; then
     echo ${dns} ${name}
 
     url="${url} ${dns}"
+
+    sleep 0.2
   done
 fi
 
