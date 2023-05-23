@@ -10,7 +10,7 @@ setup(
         'pandas==1.3.5',
         'XlsxWriter==3.0.2',
         'tables==3.7.0',
-        'requests==2.27.1'
+        'requests==2.31.0'
     ]
 )
 
