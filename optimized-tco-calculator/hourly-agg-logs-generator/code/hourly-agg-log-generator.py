@@ -229,10 +229,8 @@ if __name__ == '__main__':
                 
                 input_tco_cluster = temp_p_df2.groupby(['clusterType','clusterName','hour'],as_index=False).\
                                 agg({'memorySeconds':'mean','vcoreSeconds':'mean','elapsedTime':'mean'})
-       
 
-
-                final_input_tco_cluster = final_input_tco_cluster.append(input_tco_cluster)
+                final_input_tco_cluster = pd.concat([final_input_tco_cluster, input_tco_cluster])
 
         # T Type cluster aggreation from starhour - end hour
         t_emr_cluster = emr_cluster[emr_cluster['clusterType']=='T']
@@ -264,7 +262,8 @@ if __name__ == '__main__':
                     for h in np.roll(hours, -int(startHour)):
                         row = {'clusterType':'T', 'clusterName':name,'hour':h,'memorySeconds':mean_memory_usage,\
                                 'vcoreSeconds':mean_vcore_usage,"elapsedTime":mean_elapsed_time}
-                        final_input_tco_cluster = final_input_tco_cluster.append(row,ignore_index=True)
+                        df_row = pd.DataFrame(row, index = [0])
+                        final_input_tco_cluster = pd.concat([final_input_tco_cluster, df_row], ignore_index=True)
                       
                         if h == int(endHour) : break
 
@@ -279,7 +278,7 @@ if __name__ == '__main__':
                         s = pd.Series({'clusterType': temp.clusterType.iloc[0],'clusterName': c,\
                             'elapsedTime':0.1,'memorySeconds':0.1,'vcoreSeconds':0.1,'hour':h}, name=len(temp_df))
                         print("s.head:",s.head())
-                        final_input_tco_cluster = final_input_tco_cluster.append(s)
+                        final_input_tco_cluster = pd.concat([final_input_tco_cluster, s])
                         new_row_count = new_row_count + 1
 
         final_input_tco_cluster.sort_values(by=['clusterType','clusterName','hour'],ignore_index=True,inplace=True)
