@@ -178,7 +178,7 @@ if __name__ == '__main__':
     
     cluster_df = pd.read_excel(cluster_design,sheet_name='EMR Design Info')
     cluster_df.sort_values(by='clusterOrder',ignore_index=True,inplace=True)
-    cluster_df.fillna('ALL',inplace=True)
+    cluster_df[['queue', 'user', 'appType']] = cluster_df[['queue', 'user', 'appType']].fillna('ALL')
     cluster_df=cluster_df.apply(lambda x: x.str.upper() if x.dtype == "object" else x)
 
 # seperate yanlogs according to cluster design info 
