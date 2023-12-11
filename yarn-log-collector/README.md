@@ -14,19 +14,35 @@
 #### Parameters
 - -m: mode [1] HTTPS with Kerberos Case [2] HTTPS Case [3] HTTP Case ex) -m 3
 - -u: yarn resource manager url (http or https) ex) https://xx.xx.xx.xx:8090, http://xx..xx.xx:8088
+  - null: `aws emr list-clusters --active`
+    - Need to install [`jq`](https://stedolan.github.io/jq/download/)
 
 - Run example 
 ```
-sh start-collector.sh -m 3 -u http://10.10.160.64:8088
-Start yarn logs collecting from curl.
-HTTP Secure-Mode: 3
-YARN-RM URL: http://10.10.160.64:8088
-Yarn Cluter API target: http://10.10.160.64:8088/ws/v1/cluster/apps
-HTTP Case
+sh start-collector.sh -m 3 -u 10.10.160.64
+### Start yarn logs collecting from curl.
+### HTTP Secure-Mode: 3
+### YARN-RM HOST: 10.10.160.64
+### HTTP Case
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
 100 18.0M    0 18.0M    0     0  22.0M      0 --:--:-- --:--:-- --:--:-- 22.0M
-Collecting yarn logs completed.
+### Yarn Cluter API target: http://10.10.160.64:8088/ws/v1/cluster/apps
+### Collecting yarn logs completed.
+```
+```
+sh start-collector.sh -m 3
+### Get emr list-clusters --active.
+10.10.160.64 emr-test
+### Start yarn logs collecting from curl.
+### HTTP Secure-Mode: 3
+### YARN-RM HOST: 10.10.160.64
+### HTTP Case
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100 18.0M    0 18.0M    0     0  22.0M      0 --:--:-- --:--:-- --:--:-- 22.0M
+### Yarn Cluter API target: http://10.10.160.64:8088/ws/v1/cluster/apps
+### Collecting yarn logs completed.
 ```
 Result file(collected yarn logs) generated in output running directory.
 
@@ -41,7 +57,7 @@ Set up a cron job by checking the log retention period so that no logs are dropp
   - Cron
     Set Cron service like this
     ```
-    00 */4 * * * /home/hadoop/start-collector.sh -m 3 -u http://10.10.160.64:8088
+    00 */4 * * * /home/hadoop/start-collector.sh -m 3 -u 10.10.160.64
     ```
   - Description
     Since the production cluster is busy at specific times such as batch jobs, it is recommended to set enough margin for the execution cycle.  Therefore, though 30,000 jobs are executed a day, but the log is collected every 4 hours. After collecting logs with duplicates, it's going to be removed with orgarnizer application.
